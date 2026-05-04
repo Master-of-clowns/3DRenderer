@@ -3,6 +3,10 @@
 #include "../Renderer/Renderer.h"
 #include "../Renderer/Camera.h"
 #include "../World/World.h"
+#include "../Renderer/Display.h"
+#include "../Renderer/Screen.h"
+
+#include <SFML/Graphics.hpp>
 
 class Application {
 public:
@@ -10,7 +14,11 @@ public:
     void Run();
 
 private:
-    Renderer renderer_;
+    sf::RenderWindow window_;
+    Screen screen_;
+    Display display_;
+
     Camera camera_;
     World world_;
+    Renderer renderer_;
 };

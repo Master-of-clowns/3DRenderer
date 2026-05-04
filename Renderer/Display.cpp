@@ -8,9 +8,6 @@ Display::Display(sf::RenderWindow* window, ScreenWidth width, ScreenHeight heigh
 }
 
 void Display::Show(const Screen& screen) {
-    if (!window_)
-        return;
-
     sf::Image image(sf::Vector2u(width_, height_), sf::Color::Black);
 
     for (int y = 0; y < height_; ++y) {

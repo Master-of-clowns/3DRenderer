@@ -1,11 +1,7 @@
-//
-// Created by s24b_ on 30.01.2026.
-//
-
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include <Eigen/Dense>
+#include <numbers>
 
 using namespace Eigen;
 
@@ -16,31 +12,28 @@ public:
     Camera(const Vector3d& position, const Vector3d& direction, const Vector3d& up,
            double fovDegrees, double aspectRatio, double nearPlane, double farPlane);
 
-    const Matrix4d& GetProjectionMatrix();
-    const Matrix4d& GetViewMatrix();
-    Vector3d WorldToScreen(const Vector3d& worldPoint);
-    std::array<Vector3d, 3> TransformTriangle(const std::array<Vector3d, 3>& triangleVertices);
+    const Vector3d& GetPosition() const;
+    const Vector3d& GetDirection() const;
+    const Vector3d& GetUp() const;
+    double GetFov() const;
+    double GetAspect() const;
+    double GetNear() const;
+    double GetFar() const;
 
     void SetPosition(const Vector3d& pos);
     void SetDirection(const Vector3d& dir);
     void SetUp(const Vector3d& upVec);
+    void SetFov(double fovRadians);
+    void SetAspect(double aspectRatio);
+    void SetNear(double nearPlane);
+    void SetFar(double farPlane);
 
 private:
-    Matrix4d projectionMatrix;
-    Matrix4d viewMatrix;
-
-    Vector3d position = Vector3d(-0.8, -20, 10);
-    Vector3d direction = Vector3d(0, 1, 0);
-    Vector3d up = Vector3d(0, 0, 1);
-    double fov = M_PI / 2;
+    Vector3d position = Vector3d(0.0, -10.0, 0.0);
+    Vector3d direction = Vector3d(0.0, 1.0, 0.0);
+    Vector3d up = Vector3d(0.0, 0.0, 1.0);
+    double fov = std::numbers::pi / 2.0;
     double aspect = 16.0 / 9.0;
-    double near = 0;
-    double far = 1000;
-    bool ProjectionMatrixNeedsUpdate = true;
-    bool ViewMatrixNeedsUpdate = true;
-
-    void UpdateProjectionMatrix();
-    void UpdateViewMatrix();
+    double near = 0.1;
+    double far = 1000.0;
 };
-
-#endif //CAMERA_H
