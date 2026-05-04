@@ -6,7 +6,7 @@ using namespace std;
 #include "Figures/Triangle.h"
 #include "World/World.h"
 #include "Renderer/Renderer.h"
-#include "Camera/Camera.h"
+#include "Renderer/Camera.h"
 
 int main() {
     const int width = 1800;

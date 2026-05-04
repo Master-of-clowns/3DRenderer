@@ -1,7 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "../Camera/Camera.h"
+#include "Camera.h"
 #include "../World/World.h"
 #include <SFML/Graphics.hpp>
 

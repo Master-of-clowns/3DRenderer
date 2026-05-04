@@ -5,10 +5,10 @@
 #include "Camera.h"
 #include <cmath>
 
-#include "SFML/Graphics/Glsl.hpp"
+#include "../extern/SFML-3.0.2/include/SFML/Graphics/Glsl.hpp"
 
 Camera::Camera(const Vector3d& position, const Vector3d& direction, const Vector3d& up,
-				double fovDegrees, double aspectRatio, double nearPlane, double farPlane)
+               double fovDegrees, double aspectRatio, double nearPlane, double farPlane)
 	: position(position), direction(direction.normalized()), up(up.normalized()),
 	fov(fovDegrees * M_PI / 180.0), aspect(aspectRatio), near(nearPlane), far(farPlane),
 	ProjectionMatrixNeedsUpdate(true), ViewMatrixNeedsUpdate(true){

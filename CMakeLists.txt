@@ -11,13 +11,21 @@ add_executable(3dRenderer main.cpp
         Figures/Triangle.h
         World/World.cpp
         World/World.h
-        Camera/Camera.cpp
-        Camera/Camera.h
+        Renderer/Camera.cpp
+        Renderer/Camera.h
         Figures/Triangle.cpp
         ParserOBJ/ParserOBJ.cpp
         ParserOBJ/ParserOBJ.h
         Renderer/Renderer.cpp
-        Renderer/Renderer.h)
+        Renderer/Renderer.h
+        Application/Application.cpp
+        Application/Application.h
+        Renderer/Screen.cpp
+        Renderer/Screen.h
+        Abstract/Color.cpp
+        Abstract/Color.h
+        Renderer/Display.cpp
+        Renderer/Display.h)
 
 target_link_libraries(3dRenderer
         sfml-graphics
