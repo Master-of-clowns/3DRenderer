@@ -44,7 +44,6 @@ std::vector<Triangle> ParserOBJ::Parse(const std::string& filename){
 		}
 	}
 
-	file.close();
 	return triangles;
 }
 
@@ -54,7 +53,7 @@ void ParserOBJ::ParseVertex(const std::string& line, std::vector<Vector3d>& vert
 	double x, y, z;
 
 	iss >> prefix >> x >> y >> z;
-	vertices.push_back(Vector3d(x, y, z));
+	vertices.emplace_back(x, y, z);
 }
 
 void ParserOBJ::ParseFace(const std::string& line,

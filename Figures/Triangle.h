@@ -11,14 +11,10 @@ using namespace Eigen;
 
 class Triangle {
 public:
-
-    Triangle(){};
-
+    Triangle() = default;
     Triangle(Vector3d p1, Vector3d p2, Vector3d p3);
-
-    Vector3d GetNormal();
-
     std::array<Vector3d, 3> GetVertices() const;
+    const Vector3d& GetNormal() const;
 
 private:
     Vector3d vertex1;

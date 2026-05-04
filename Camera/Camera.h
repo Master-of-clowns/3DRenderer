@@ -9,53 +9,38 @@
 
 using namespace Eigen;
 
-class Camera{
+class Camera {
 public:
-	Camera();
+    Camera() = default;
 
-	Camera(const Vector3d& position, const Vector3d& direction, const Vector3d& up,
-			double fovDegrees, double aspectRatio, double nearPlane, double farPlane);
+    Camera(const Vector3d& position, const Vector3d& direction, const Vector3d& up,
+           double fovDegrees, double aspectRatio, double nearPlane, double farPlane);
 
-	Matrix4d GetProjectionMatrix() const;
-	Matrix4d GetViewMatrix() const;
-	Vector3d WorldToScreen(const Vector3d& worldPoint) const;
-	std::array<Vector3d, 3> TransformTriangle(const std::array<Vector3d, 3>& triangleVertices) const;
+    const Matrix4d& GetProjectionMatrix();
+    const Matrix4d& GetViewMatrix();
+    Vector3d WorldToScreen(const Vector3d& worldPoint);
+    std::array<Vector3d, 3> TransformTriangle(const std::array<Vector3d, 3>& triangleVertices);
 
-	void SetPosition(const Vector3d& pos){
-		position = pos;
-		ViewMatrixNeedsUpdate = true;
-	}
-
-	void SetDirection(const Vector3d& dir){
-		direction = dir.normalized();
-		ViewMatrixNeedsUpdate = true;
-	}
-
-	void SetUp(const Vector3d& upVec){
-		up = upVec.normalized();
-		ViewMatrixNeedsUpdate = true;
-	}
-
-	void UpdateProjectionMatrix();
-	void UpdateViewMatrix();
+    void SetPosition(const Vector3d& pos);
+    void SetDirection(const Vector3d& dir);
+    void SetUp(const Vector3d& upVec);
 
 private:
-	Vector3d position;
-	Vector3d direction;
-	Vector3d up;
+    Matrix4d projectionMatrix;
+    Matrix4d viewMatrix;
 
-	double fov;
-	double aspect;
-	double near;
-	double far;
+    Vector3d position = Vector3d(-0.8, -20, 10);
+    Vector3d direction = Vector3d(0, 1, 0);
+    Vector3d up = Vector3d(0, 0, 1);
+    double fov = M_PI / 2;
+    double aspect = 16.0 / 9.0;
+    double near = 0;
+    double far = 1000;
+    bool ProjectionMatrixNeedsUpdate = true;
+    bool ViewMatrixNeedsUpdate = true;
 
-	Matrix4d projectionMatrix;
-	Matrix4d viewMatrix;
-	bool ProjectionMatrixNeedsUpdate;
-	bool ViewMatrixNeedsUpdate;
-
-
+    void UpdateProjectionMatrix();
+    void UpdateViewMatrix();
 };
-
 
 #endif //CAMERA_H

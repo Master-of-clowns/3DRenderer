@@ -7,30 +7,30 @@
 
 class Renderer {
 private:
-	int width;
-	int height;
-	Camera camera;
-	World world;
+    int width_;
+    int height_;
+    Camera camera_;
+    World world_;
 
-	sf::RenderWindow window;
+    sf::RenderWindow window_;
 
-	sf::Color backgroundColor = sf::Color::Black;
-	sf::Color lineColor = sf::Color::White;
+    sf::Color backgroundColor_ = sf::Color::Black;
+    sf::Color lineColor_ = sf::Color::White;
 
 public:
-	Renderer(int width, int height);
+    Renderer(int width, int height);
 
-	void SetCamera(const Camera& camera);
-	void SetWorld(const World& world);
+    void SetCamera(const Camera& camera);
+    void SetWorld(const World& world);
 
-	void Render();
-	bool IsOpen() const;
-	void ProcessEvents();
-	void Close();
+    void Render();
+    bool IsOpen() const;
+    void ProcessEvents();
+    void Close();
 
 private:
-	sf::Vector2f WorldToScreen(const Eigen::Vector3d& worldPoint) const;
-	void DrawTriangle(const Triangle& triangle);
+    sf::Vector2f WorldToScreen(const Eigen::Vector3d& worldPoint);
+    void DrawTriangle(const Triangle& triangle);
 };
 
 #endif // RENDERER_H
