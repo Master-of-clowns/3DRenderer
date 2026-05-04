@@ -6,7 +6,8 @@
 enum ScreenWidth : int;
 enum ScreenHeight : int;
 
-class Screen {
+class Screen
+{
 public:
     Screen(ScreenWidth width, ScreenHeight height);
 

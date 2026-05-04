@@ -8,7 +8,8 @@
 
 #include <SFML/Graphics.hpp>
 
-class Application {
+class Application
+{
 public:
     Application();
     void Run();

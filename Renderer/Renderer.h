@@ -9,7 +9,8 @@
 
 using namespace Eigen;
 
-class Renderer {
+class Renderer
+{
 public:
     Renderer() = default;
 

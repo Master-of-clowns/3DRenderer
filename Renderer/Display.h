@@ -3,7 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include "Screen.h"
 
-class Display {
+class Display
+{
 public:
     Display(sf::RenderWindow* window, ScreenWidth width, ScreenHeight height);
     void Show(const Screen& screen);

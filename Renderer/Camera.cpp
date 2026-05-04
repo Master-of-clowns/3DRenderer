@@ -1,7 +1,3 @@
-//
-// Created by s24b_ on 30.01.2026.
-//
-
 #include "Camera.h"
 #include <cmath>
 

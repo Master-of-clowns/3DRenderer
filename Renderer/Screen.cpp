@@ -23,6 +23,3 @@ void Screen::DrawPixel(int x, int y, Color&& color) {
 const Color& Screen::GetPixel(int x, int y) const {
     return screen_[y][x];
 }
-
-
-

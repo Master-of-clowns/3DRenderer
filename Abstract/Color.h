@@ -1,6 +1,7 @@
 #pragma once
 
-class Color {
+class Color
+{
 public:
     Color() = default;
     Color(int r, int g, int b);

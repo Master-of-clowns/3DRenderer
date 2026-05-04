@@ -1,15 +1,11 @@
-//
-// Created by s24b_ on 29.01.2026.
-//
-
-#ifndef TRIANGLE_H
-#define TRIANGLE_H
+#pragma once
 
 #include <Eigen/Dense>
 
 using namespace Eigen;
 
-class Triangle {
+class Triangle
+{
 public:
     Triangle() = default;
     Triangle(Vector3d p1, Vector3d p2, Vector3d p3);
@@ -23,5 +19,3 @@ private:
 
     Vector3d normal;
 };
-
-#endif //TRIANGLE_H

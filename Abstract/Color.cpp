@@ -33,5 +33,3 @@ void Color::SetG(double g) {
 void Color::SetB(double b) {
     b_ = b;
 }
-
-
