@@ -5,3 +5,4 @@ skull.obj
 Humster.obj
 teapot.obj
 .gitignore
+cmake-build-release/
