@@ -2,14 +2,14 @@
 
 #include "../Renderer/Renderer.h"
 #include "../Renderer/Camera.h"
+#include "../Renderer/CameraController.h"
 #include "../World/World.h"
 #include "../Renderer/Display.h"
 #include "../Renderer/Screen.h"
 
 #include <SFML/Graphics.hpp>
 
-class Application
-{
+class Application {
 public:
     Application();
     void Run();
@@ -20,6 +20,7 @@ private:
     Display display_;
 
     Camera camera_;
+    CameraController cameraController_;
     World world_;
     Renderer renderer_;
 };

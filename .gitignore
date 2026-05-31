@@ -1,4 +1,7 @@
 cmake-build-debug/
 extern/
 .idea/
-12140_Skull_v3_L2.obj
+skull.obj
+Humster.obj
+teapot.obj
+.gitignore

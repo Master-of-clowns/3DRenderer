@@ -5,26 +5,39 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_library(eigen INTERFACE)
-target_include_directories(eigen INTERFACE extern/eigen)
+get_property(_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(NOT _is_multi_config AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
 
-add_subdirectory(extern/SFML-3.0.2)
+add_library(eigen INTERFACE)
+target_include_directories(eigen SYSTEM INTERFACE extern/eigen)
+
+add_subdirectory(extern/SFML-3.0.2 EXCLUDE_FROM_ALL)
 
 add_executable(3dRenderer
         main.cpp
+
         Abstract/Color.cpp
+
         Application/Application.cpp
+
+        Figures/Object.cpp
         Figures/Triangle.cpp
+
         ParserOBJ/ParserOBJ.cpp
+
         Renderer/Camera.cpp
+        Renderer/CameraController.cpp
         Renderer/Display.cpp
+        Renderer/Light.cpp
         Renderer/Renderer.cpp
         Renderer/Screen.cpp
+
         World/World.cpp
 )
 
-target_link_libraries(3dRenderer
-        PRIVATE
+target_link_libraries(3dRenderer PRIVATE
         eigen
         sfml-graphics
         sfml-window

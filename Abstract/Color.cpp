@@ -1,13 +1,8 @@
-//
-// Created by s24b_ on 04.05.2026.
-//
-
 #include "Color.h"
+#include <algorithm>
 
-Color::Color(int r, int g, int b) {
-    r_ = r;
-    g_ = g;
-    b_ = b;
+Color::Color(double r, double g, double b)
+    : r_(r), g_(g), b_(b) {
 }
 
 double Color::GetR() const {
@@ -32,4 +27,24 @@ void Color::SetG(double g) {
 
 void Color::SetB(double b) {
     b_ = b;
+}
+
+Color Color::operator*(double k) const {
+    return Color(r_ * k, g_ * k, b_ * k);
+}
+
+Color Color::operator*(const Color& other) const {
+    return Color(r_ * other.r_, g_ * other.g_, b_ * other.b_);
+}
+
+Color Color::operator+(const Color& other) const {
+    return Color(r_ + other.r_, g_ + other.g_, b_ + other.b_);
+}
+
+Color Color::Clamped() const {
+    return Color(
+        std::clamp(r_, 0.0, 1.0),
+        std::clamp(g_, 0.0, 1.0),
+        std::clamp(b_, 0.0, 1.0)
+        );
 }

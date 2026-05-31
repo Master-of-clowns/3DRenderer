@@ -1,43 +1,80 @@
 #include "Application.h"
 #include "../ParserOBJ/ParserOBJ.h"
+#include "../Figures/Object.h"
+#include "../Renderer/Light.h"
 
 #include <iostream>
 
-// Я понимаю, что все эти параметры нужно вынести в отдельный файл, но пока сделал так.
+namespace {
+constexpr unsigned int kWidth  = 1800;
+constexpr unsigned int kHeight = 1800;
+}
 
 Application::Application()
-    : window_(sf::VideoMode({1800, 1800}), "3D Renderer")
-      , screen_(ScreenWidth{static_cast<int>(1800)}, ScreenHeight{static_cast<int>(1800)})
-      , display_(&window_, ScreenWidth{static_cast<int>(1800)}, ScreenHeight{static_cast<int>(1800)})
-      , camera_(
-          Vector3d(0.0, -40.0, 10.0),
-          Vector3d(0.0, 1.0, 0.0),
-          Vector3d(0.0, 0.0, 1.0),
-          60.0,
-          static_cast<double>(1800) / 1800,
-          0.1,
-          2000.0
-          ) {
+    : window_(sf::VideoMode({kWidth, kHeight}), "3D Renderer")
+    , screen_(ScreenWidth{static_cast<int>(kWidth)}, ScreenHeight{static_cast<int>(kHeight)})
+    , display_(&window_, ScreenWidth{static_cast<int>(kWidth)}, ScreenHeight{static_cast<int>(kHeight)})
+    , camera_(
+        Vector3d(-100.0, 0, 0.0),
+        Vector3d(-1.0, 0, 0.0),
+        Vector3d(0.0, 0.0, 1.0),
+        60.0,
+        static_cast<double>(kWidth) / kHeight,
+        0.1,
+        2000.0
+      )
+    , cameraController_(&camera_, Vector3d(0.0, 0.0, 0.0), 200.0, 0.0, 0.3)
+{
     window_.setFramerateLimit(60);
 
     ParserOBJ parser;
-    std::string filename = "../12140_Skull_v3_L2.obj";
-
+    std::string filename = "../skull.obj";
     std::cout << "Loading OBJ file: " << filename << std::endl;
-    world_ = World(parser.Parse(filename));
+
+    Object skull(parser.Parse(filename), Vector3d(0.0, 0.0, -10.0));
+    skull.SetColor(Color(0.85, 0.80, 0.70));
+    world_.AddObject(std::move(skull));
+
+    Light light(
+        Vector3d(150.0, 150.0, 200.0),
+        Color(1.0, 1.0, 1.0),
+        1.0,
+        400.0
+    );
+    world_.SetLight(light);
 }
 
-
 void Application::Run() {
+    sf::Clock clock;
+
+    double secondAccumulator = 0.0;
+    int framesInSecond = 0;
+
     while (window_.isOpen()) {
+        double deltaSeconds = clock.restart().asSeconds();
+
         while (const std::optional event = window_.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window_.close();
+            } else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+                if (keyPressed->code == sf::Keyboard::Key::Tab) {
+                    renderer_.ToggleRenderMode();
+                }
             }
         }
+
+        cameraController_.Update(deltaSeconds);
 
         window_.clear(sf::Color::Black);
         display_.Show(renderer_.Render(world_, camera_, screen_));
         window_.display();
+
+        ++framesInSecond;
+        secondAccumulator += deltaSeconds;
+        if (secondAccumulator >= 1.0) {
+            std::cout << "FPS: " << framesInSecond << std::endl;
+            framesInSecond = 0;
+            secondAccumulator -= 1.0;
+        }
     }
 }

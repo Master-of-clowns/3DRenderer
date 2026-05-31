@@ -1,5 +1,4 @@
 #include "Camera.h"
-#include <cmath>
 
 Camera::Camera(const Vector3d& position, const Vector3d& direction, const Vector3d& up,
                double fovDegrees, double aspectRatio, double nearPlane, double farPlane)

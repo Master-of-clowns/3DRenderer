@@ -30,7 +30,7 @@ public:
     void SetFar(double farPlane);
 
 private:
-    Vector3d position = Vector3d(0.0, -10.0, 0.0);
+    Vector3d position = Vector3d(0.0, -1.0, 0.0);
     Vector3d direction = Vector3d(0.0, 1.0, 0.0);
     Vector3d up = Vector3d(0.0, 0.0, 1.0);
     double fov = std::numbers::pi / 2.0;
