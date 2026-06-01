@@ -1,8 +1,0 @@
-cmake-build-debug/
-extern/
-.idea/
-skull.obj
-Humster.obj
-teapot.obj
-.gitignore
-cmake-build-release/
