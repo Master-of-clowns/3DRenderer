@@ -20,7 +20,7 @@ private:
     Display display_;
 
     Camera camera_;
-    CameraController cameraController_;
+    CameraController camera_controller_;
     World world_;
     Renderer renderer_;
 };

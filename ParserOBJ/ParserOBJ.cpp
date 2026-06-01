@@ -22,9 +22,9 @@ std::vector<Triangle> ParserOBJ::Parse(const std::string& filename) {
     while (std::getline(file, line)) {
         lineNum++;
 
-        size_t commentPos = line.find('#');
-        if (commentPos != std::string::npos) {
-            line = line.substr(0, commentPos);
+        size_t comment_pos = line.find('#');
+        if (comment_pos != std::string::npos) {
+            line = line.substr(0, comment_pos);
         }
 
         line.erase(std::remove_if(line.begin(), line.end(),
@@ -69,7 +69,7 @@ void ParserOBJ::ParseFace(const std::string& line,
         return;
     }
 
-    std::vector<int> vertexIndices;
+    std::vector<int> vertex_indices;
 
     for (size_t i = 1; i < parts.size(); i++) {
         std::vector<std::string> subparts = Split(parts[i], '/');
@@ -78,9 +78,9 @@ void ParserOBJ::ParseFace(const std::string& line,
             try {
                 int idx = std::stoi(subparts[0]);
                 if (idx > 0) {
-                    vertexIndices.push_back(idx - 1);
+                    vertex_indices.push_back(idx - 1);
                 } else if (idx < 0) {
-                    vertexIndices.push_back(vertices.size() + idx);
+                    vertex_indices.push_back(vertices.size() + idx);
                 }
             } catch (...) {
                 std::cerr << "Could not parse vertex index: " << parts[i] << std::endl;
@@ -88,11 +88,11 @@ void ParserOBJ::ParseFace(const std::string& line,
         }
     }
 
-    if (vertexIndices.size() >= 3) {
-        for (size_t i = 1; i < vertexIndices.size() - 1; i++) {
-            int idx1 = vertexIndices[0];
-            int idx2 = vertexIndices[i];
-            int idx3 = vertexIndices[i + 1];
+    if (vertex_indices.size() >= 3) {
+        for (size_t i = 1; i < vertex_indices.size() - 1; i++) {
+            int idx1 = vertex_indices[0];
+            int idx2 = vertex_indices[i];
+            int idx3 = vertex_indices[i + 1];
 
             if (idx1 >= 0 && idx1 < static_cast<int>(vertices.size()) &&
                 idx2 >= 0 && idx2 < static_cast<int>(vertices.size()) &&

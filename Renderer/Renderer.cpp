@@ -24,13 +24,13 @@ Matrix4d Renderer::ComputeProjectionMatrix(const Camera& camera) const {
     double near = camera.GetNear();
     double far = camera.GetFar();
 
-    double tanHalfFov = std::tan(fov / 2.0);
+    double half_tan = std::tan(fov / 2.0);
     double range = far - near;
 
     Matrix4d projection;
     projection.setZero();
-    projection(0, 0) = 1.0 / (aspect * tanHalfFov);
-    projection(1, 1) = 1.0 / tanHalfFov;
+    projection(0, 0) = 1.0 / (aspect * half_tan);
+    projection(1, 1) = 1.0 / half_tan;
     projection(2, 2) = -(far + near) / range;
     projection(2, 3) = -2.0 * far * near / range;
     projection(3, 2) = -1.0;
@@ -38,20 +38,20 @@ Matrix4d Renderer::ComputeProjectionMatrix(const Camera& camera) const {
 }
 
 Matrix4d Renderer::ComputeViewMatrix(const Camera& camera) const {
-    Vector3d zAxis = -camera.GetDirection();
-    Vector3d xAxis = camera.GetUp().cross(zAxis).normalized();
-    Vector3d yAxis = zAxis.cross(xAxis);
+    Vector3d z = -camera.GetDirection();
+    Vector3d x = camera.GetUp().cross(z).normalized();
+    Vector3d y = z.cross(x);
 
     Matrix4d view;
     view.setIdentity();
-    view.block<1, 3>(0, 0) = xAxis.transpose();
-    view.block<1, 3>(1, 0) = yAxis.transpose();
-    view.block<1, 3>(2, 0) = zAxis.transpose();
+    view.block<1, 3>(0, 0) = x.transpose();
+    view.block<1, 3>(1, 0) = y.transpose();
+    view.block<1, 3>(2, 0) = z.transpose();
 
     const Vector3d& pos = camera.GetPosition();
-    view(0, 3) = -xAxis.dot(pos);
-    view(1, 3) = -yAxis.dot(pos);
-    view(2, 3) = -zAxis.dot(pos);
+    view(0, 3) = -x.dot(pos);
+    view(1, 3) = -y.dot(pos);
+    view(2, 3) = -z.dot(pos);
     return view;
 }
 
@@ -60,14 +60,14 @@ Vector4d Renderer::ToClip(const Vector3d& world, const Matrix4d& view, const Mat
     return proj * (view * p);
 }
 
-Color Renderer::ShadeVertex(const Vector3d& worldPos, const Vector3d& worldNormal,
-                            const Color& baseColor, const Light& light) const {
-    Vector3d normal = worldNormal;
+Color Renderer::ShadeVertex(const Vector3d& world_pos, const Vector3d& world_normal,
+                            const Color& base_color, const Light& light) const {
+    Vector3d normal = world_normal;
     if (normal.norm() > 1e-12) {
         normal.normalize();
     }
 
-    Vector3d toLight = light.GetPosition() - worldPos;
+    Vector3d toLight = light.GetPosition() - world_pos;
     double distance = toLight.norm();
     if (distance > 1e-12) {
         toLight /= distance;
@@ -82,16 +82,16 @@ Color Renderer::ShadeVertex(const Vector3d& worldPos, const Vector3d& worldNorma
         attenuation = 1.0 / (1.0 + ratio * ratio);
     }
 
-    double diffuseStrength = lambert * light.GetIntensity() * attenuation;
+    double light_power = lambert * light.GetIntensity() * attenuation;
 
-    Color diffuse = baseColor * light.GetColor() * diffuseStrength;
-    Color ambientPart = baseColor * ambient_;
+    Color diffuse = base_color * light.GetColor() * light_power;
+    Color ambient = base_color * ambient_;
 
-    return (ambientPart + diffuse).Clamped();
+    return (ambient + diffuse).Clamped();
 }
 
 Screen Renderer::Render(const World& world, const Camera& camera, Screen& screen) {
-    screen.Clear(backgroundColor_);
+    screen.Clear(background_color_);
 
     Matrix4d view = ComputeViewMatrix(camera);
     Matrix4d proj = ComputeProjectionMatrix(camera);
@@ -100,48 +100,48 @@ Screen Renderer::Render(const World& world, const Camera& camera, Screen& screen
     int w = screen.GetWidth();
     int h = screen.GetHeight();
 
-    const bool isWire = (mode_ == RenderMode::Wireframe);
+    const bool is_wire = (mode_ == RenderMode::Wireframe);
 
     for (const Object& object : world) {
         Matrix4d model = object.GetModelMatrix();
-        const Color& baseColor = object.GetColor();
+        const Color& base_color = object.GetColor();
 
-        Matrix3d normalMatrix = model.block<3, 3>(0, 0);
+        Matrix3d normal_matrix = model.block<3, 3>(0, 0);
 
         for (const Triangle& triangle : object.GetTriangles()) {
-            auto localVerts = triangle.GetVertices();
+            auto local_verts = triangle.GetVertices();
             auto vertexNormals = triangle.GetVertexNormals();
 
-            std::array<ClipVertex, 3> clipVerts;
-            bool behindCamera = false;
+            std::array<ClipVertex, 3> clip_verts;
+            bool behind_camera = false;
 
             for (int i = 0; i < 3; ++i) {
-                Vector4d worldH = model * Vector4d(localVerts[i].x(),
-                                                   localVerts[i].y(),
-                                                   localVerts[i].z(), 1.0);
+                Vector4d world_h = model * Vector4d(local_verts[i].x(),
+                                                   local_verts[i].y(),
+                                                   local_verts[i].z(), 1.0);
 
-                if (!isWire) {
-                    Vector3d worldPos(worldH.x(), worldH.y(), worldH.z());
-                    Vector3d worldNormal = normalMatrix * vertexNormals[i];
-                    clipVerts[i].color = ShadeVertex(worldPos, worldNormal, baseColor, light);
+                if (!is_wire) {
+                    Vector3d world_pos(world_h.x(), world_h.y(), world_h.z());
+                    Vector3d world_normal = normal_matrix * vertexNormals[i];
+                    clip_verts[i].color = ShadeVertex(world_pos, world_normal, base_color, light);
                 } else {
-                    clipVerts[i].color = wireframeColor_;
+                    clip_verts[i].color = frame_color_;
                 }
 
-                clipVerts[i].clip = proj * (view * worldH);
+                clip_verts[i].clip = proj * (view * world_h);
 
-                if (clipVerts[i].clip.w() <= 1e-9) {
-                    behindCamera = true;
+                if (clip_verts[i].clip.w() <= 1e-9) {
+                    behind_camera = true;
                     break;
                 }
             }
 
-            if (behindCamera) {
+            if (behind_camera) {
                 continue;
             }
 
             std::vector<ClipVertex> polygon = ClipPolygon(
-                {clipVerts[0], clipVerts[1], clipVerts[2]});
+                {clip_verts[0], clip_verts[1], clip_verts[2]});
 
             if (polygon.size() < 3) {
                 continue;
@@ -151,7 +151,7 @@ Screen Renderer::Render(const World& world, const Camera& camera, Screen& screen
             for (size_t i = 1; i + 1 < polygon.size(); ++i) {
                 ShadedVertex b = ToShaded(polygon[i], w, h);
                 ShadedVertex c = ToShaded(polygon[i + 1], w, h);
-                if (isWire) {
+                if (is_wire) {
                     DrawTriangleWireframe(screen, first, b, c);
                 } else {
                     RasterizeTriangle(screen, first, b, c);
@@ -164,15 +164,15 @@ Screen Renderer::Render(const World& world, const Camera& camera, Screen& screen
 }
 
 Renderer::ShadedVertex Renderer::ToShaded(const ClipVertex& v, int width, int height) const {
-    double invW = 1.0 / v.clip.w();
-    double ndcX = v.clip.x() * invW;
-    double ndcY = v.clip.y() * invW;
-    double ndcZ = v.clip.z() * invW;
+    double inv_w = 1.0 / v.clip.w();
+    double ndc_x = v.clip.x() * inv_w;
+    double ndc_y = v.clip.y() * inv_w;
+    double ndc_z = v.clip.z() * inv_w;
 
     ShadedVertex s;
-    s.x = (ndcX + 1.0) * 0.5 * width;
-    s.y = (1.0 - ndcY) * 0.5 * height;
-    s.depth = ndcZ;
+    s.x = (ndc_x + 1.0) * 0.5 * width;
+    s.y = (1.0 - ndc_y) * 0.5 * height;
+    s.depth = ndc_z;
     s.color = v.color;
     return s;
 }
@@ -215,18 +215,18 @@ std::vector<Renderer::ClipVertex> Renderer::ClipPolygon(const std::vector<ClipVe
             const ClipVertex& current = poly[i];
             const ClipVertex& next = poly[(i + 1) % n];
 
-            double dCurrent = distance(current, plane);
-            double dNext = distance(next, plane);
+            double cur_d = distance(current, plane);
+            double next_d = distance(next, plane);
 
-            bool currentInside = dCurrent >= 0.0;
-            bool nextInside = dNext >= 0.0;
+            bool cur_inside = cur_d >= 0.0;
+            bool next_inside = next_d >= 0.0;
 
-            if (currentInside) {
+            if (cur_inside) {
                 output.push_back(current);
             }
 
-            if (currentInside != nextInside) {
-                double t = dCurrent / (dCurrent - dNext);
+            if (cur_inside != next_inside) {
+                double t = cur_d / (cur_d - next_d);
                 output.push_back(lerp(current, next, t));
             }
         }
@@ -244,12 +244,12 @@ void Renderer::RasterizeTriangle(Screen& screen,
     int w = screen.GetWidth();
     int h = screen.GetHeight();
 
-    int minX = std::max(0, static_cast<int>(std::floor(std::min({a.x, b.x, c.x}))));
-    int maxX = std::min(w - 1, static_cast<int>(std::ceil(std::max({a.x, b.x, c.x}))));
-    int minY = std::max(0, static_cast<int>(std::floor(std::min({a.y, b.y, c.y}))));
-    int maxY = std::min(h - 1, static_cast<int>(std::ceil(std::max({a.y, b.y, c.y}))));
+    int min_x = std::max(0, static_cast<int>(std::floor(std::min({a.x, b.x, c.x}))));
+    int max_x = std::min(w - 1, static_cast<int>(std::ceil(std::max({a.x, b.x, c.x}))));
+    int min_y = std::max(0, static_cast<int>(std::floor(std::min({a.y, b.y, c.y}))));
+    int max_y = std::min(h - 1, static_cast<int>(std::ceil(std::max({a.y, b.y, c.y}))));
 
-    if (minX > maxX || minY > maxY) {
+    if (min_x > max_x || min_y > max_y) {
         return;
     }
 
@@ -257,16 +257,16 @@ void Renderer::RasterizeTriangle(Screen& screen,
     if (std::abs(area) < 1e-9) {
         return;
     }
-    double invArea = 1.0 / area;
+    double inv_area = 1.0 / area;
 
-    for (int y = minY; y <= maxY; ++y) {
-        for (int x = minX; x <= maxX; ++x) {
+    for (int y = min_y; y <= max_y; ++y) {
+        for (int x = min_x; x <= max_x; ++x) {
 
             double px = x + 0.5;
             double py = y + 0.5;
 
-            double w0 = ((b.x - px) * (c.y - py) - (c.x - px) * (b.y - py)) * invArea;
-            double w1 = ((c.x - px) * (a.y - py) - (a.x - px) * (c.y - py)) * invArea;
+            double w0 = ((b.x - px) * (c.y - py) - (c.x - px) * (b.y - py)) * inv_area;
+            double w1 = ((c.x - px) * (a.y - py) - (a.x - px) * (c.y - py)) * inv_area;
             double w2 = 1.0 - w0 - w1;
 
             const double eps = -1e-9;
@@ -298,11 +298,12 @@ void Renderer::DrawTriangleWireframe(Screen& screen,
     int x2 = static_cast<int>(std::round(c.x));
     int y2 = static_cast<int>(std::round(c.y));
 
-    DrawLine(screen, x0, y0, x1, y1, wireframeColor_);
-    DrawLine(screen, x1, y1, x2, y2, wireframeColor_);
-    DrawLine(screen, x2, y2, x0, y0, wireframeColor_);
+    DrawLine(screen, x0, y0, x1, y1, frame_color_);
+    DrawLine(screen, x1, y1, x2, y2, frame_color_);
+    DrawLine(screen, x2, y2, x0, y0, frame_color_);
 }
 
+// Алгоритм рисования прямых из интернета
 void Renderer::DrawLine(Screen& screen, int x0, int y0, int x1, int y1, const Color& color) const {
     int w = screen.GetWidth();
     int h = screen.GetHeight();

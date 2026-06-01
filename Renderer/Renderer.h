@@ -29,26 +29,26 @@ public:
     void ToggleRenderMode();
 
 private:
-    Color backgroundColor_ = Color(0.05, 0.05, 0.08);
-    // Color ambient_ = Color(0.25, 0.25, 0.28);
-    Color ambient_ = Color(0.25, 0.25, 0.28);
-    Color wireframeColor_ = Color(1.0, 1.0, 1.0);
 
-    RenderMode mode_ = RenderMode::Solid;
-
-    struct ShadedVertex
-    {
+ // Эти структуры нцжны только тут, так что вот так получилось
+    struct ShadedVertex {
         double x = 0.0;
         double y = 0.0;
         double depth = 0.0;
         Color color;
     };
 
-    struct ClipVertex
-    {
+    struct ClipVertex {
         Vector4d clip = Vector4d::Zero();
         Color color;
     };
+
+    Color background_color_ = Color(0.05, 0.05, 0.08);
+    // Color ambient_ = Color(0.25, 0.25, 0.28);
+    Color ambient_ = Color(0.25, 0.25, 0.28);
+    Color frame_color_ = Color(1.0, 1.0, 1.0);
+
+    RenderMode mode_ = RenderMode::Solid;
 
     Matrix4d ComputeProjectionMatrix(const Camera& camera) const;
     Matrix4d ComputeViewMatrix(const Camera& camera) const;

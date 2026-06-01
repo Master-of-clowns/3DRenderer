@@ -6,8 +6,8 @@
 #include <iostream>
 
 namespace {
-constexpr unsigned int kWidth  = 1800;
-constexpr unsigned int kHeight = 1800;
+constexpr unsigned int kWidth  = 600;
+constexpr unsigned int kHeight = 600;
 }
 
 Application::Application()
@@ -23,15 +23,16 @@ Application::Application()
         0.1,
         2000.0
       )
-    , cameraController_(&camera_, Vector3d(0.0, 0.0, 0.0), 200.0, 0.0, 0.3)
+    , camera_controller_(&camera_, Vector3d(0.0, 0.0, 0.0), 200.0, 0.0, 0.3)
 {
     window_.setFramerateLimit(60);
 
     ParserOBJ parser;
-    std::string filename = "../skull.obj";
+    std::string filename = "../humster.obj";
     std::cout << "Loading OBJ file: " << filename << std::endl;
 
-    Object skull(parser.Parse(filename), Vector3d(0.0, 0.0, -10.0));
+    Object skull(parser.Parse(filename), Vector3d(0.0, 0.0, .0));
+    std::cout << "len " << skull.GetTriangles().size() << std::endl;
     skull.SetColor(Color(0.85, 0.80, 0.70));
     world_.AddObject(std::move(skull));
 
@@ -48,7 +49,7 @@ void Application::Run() {
     sf::Clock clock;
 
     double secondAccumulator = 0.0;
-    int framesInSecond = 0;
+    int frames = 0;
 
     while (window_.isOpen()) {
         double deltaSeconds = clock.restart().asSeconds();
@@ -63,17 +64,17 @@ void Application::Run() {
             }
         }
 
-        cameraController_.Update(deltaSeconds);
+        camera_controller_.Update(deltaSeconds);
 
         window_.clear(sf::Color::Black);
         display_.Show(renderer_.Render(world_, camera_, screen_));
         window_.display();
 
-        ++framesInSecond;
+        ++frames;
         secondAccumulator += deltaSeconds;
         if (secondAccumulator >= 1.0) {
-            std::cout << "FPS: " << framesInSecond << std::endl;
-            framesInSecond = 0;
+            std::cout << "FPS: " << frames << std::endl;
+            frames = 0;
             secondAccumulator -= 1.0;
         }
     }

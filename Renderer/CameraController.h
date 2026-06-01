@@ -29,10 +29,10 @@ private:
     double yaw_ = 0.0;
     double pitch_ = 0.3;
 
-    double orbitSpeed_ = 1.5;
-    double zoomSpeed_ = 2;
+    double orbit_speed_ = 1.5;
+    double zoom_speed_ = 2;
 
-    double minDistance_ = 1.0;
-    double maxDistance_ = 5000.0;
-    double maxPitch_ = 1.55;
+    double min_distance_ = 1.0;
+    double max_distance_ = 5000.0;
+    double max_pitch_ = 1.55;
 };

@@ -13,8 +13,8 @@ void CameraController::Update(double deltaSeconds) {
         return;
     }
 
-    double orbitStep = orbitSpeed_ * deltaSeconds;
-    double zoomStep = 1 + (zoomSpeed_ - 1) * deltaSeconds;
+    double orbitStep = orbit_speed_ * deltaSeconds;
+    double zoomStep = 1 + (zoom_speed_ - 1) * deltaSeconds;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
         yaw_ -= orbitStep;
@@ -35,8 +35,8 @@ void CameraController::Update(double deltaSeconds) {
         distance_ *= zoomStep;
     }
 
-    pitch_ = std::clamp(pitch_, -maxPitch_, maxPitch_);
-    distance_ = std::clamp(distance_, minDistance_, maxDistance_);
+    pitch_ = std::clamp(pitch_, -max_pitch_, max_pitch_);
+    distance_ = std::clamp(distance_, min_distance_, max_distance_);
 
     ApplyToCamera();
 }
@@ -47,16 +47,16 @@ void CameraController::SetTarget(const Vector3d& target) {
 }
 
 void CameraController::SetDistance(double distance) {
-    distance_ = std::clamp(distance, minDistance_, maxDistance_);
+    distance_ = std::clamp(distance, min_distance_, max_distance_);
     ApplyToCamera();
 }
 
 void CameraController::SetOrbitSpeed(double radiansPerSecond) {
-    orbitSpeed_ = radiansPerSecond;
+    orbit_speed_ = radiansPerSecond;
 }
 
 void CameraController::SetZoomSpeed(double unitsPerSecond) {
-    zoomSpeed_ = unitsPerSecond;
+    zoom_speed_ = unitsPerSecond;
 }
 
 void CameraController::ApplyToCamera() {
