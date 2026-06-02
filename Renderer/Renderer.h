@@ -56,8 +56,11 @@ private:
     std::vector<ClipVertex> ClipPolygon(const std::vector<ClipVertex>& input) const;
     ShadedVertex ToShaded(const ClipVertex& v, int width, int height) const;
 
-    Color ShadeVertex(const Vector3d& worldPos, const Vector3d& worldNormal,
-                      const Color& baseColor, const Light& light) const;
+    Color ApplyLight(const Vector3d& world_pos, const Vector3d& world_normal,
+                  const Color& base_color, const Light& light) const;
+
+    Color ShadeVertex(const Vector3d& world_pos, const Vector3d& world_normal,
+                      const Color& base_color, const std::vector<Light>& light) const;
 
     void RasterizeTriangle(Screen& screen,
                            const ShadedVertex& a,

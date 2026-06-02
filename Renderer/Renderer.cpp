@@ -60,20 +60,20 @@ Vector4d Renderer::ToClip(const Vector3d& world, const Matrix4d& view, const Mat
     return proj * (view * p);
 }
 
-Color Renderer::ShadeVertex(const Vector3d& world_pos, const Vector3d& world_normal,
-                            const Color& base_color, const Light& light) const {
+Color Renderer::ApplyLight(const Vector3d& world_pos, const Vector3d& world_normal,
+              const Color& base_color, const Light& light) const {
     Vector3d normal = world_normal;
     if (normal.norm() > 1e-12) {
         normal.normalize();
     }
 
-    Vector3d toLight = light.GetPosition() - world_pos;
-    double distance = toLight.norm();
+    Vector3d to_light = light.GetPosition() - world_pos;
+    double distance = to_light.norm();
     if (distance > 1e-12) {
-        toLight /= distance;
+        to_light /= distance;
     }
 
-    double lambert = std::max(0.0, normal.dot(toLight));
+    double lambert = std::max(0.0, normal.dot(to_light));
 
     double range = light.GetRange();
     double attenuation = 1.0;
@@ -85,6 +85,17 @@ Color Renderer::ShadeVertex(const Vector3d& world_pos, const Vector3d& world_nor
     double light_power = lambert * light.GetIntensity() * attenuation;
 
     Color diffuse = base_color * light.GetColor() * light_power;
+    return diffuse;
+}
+
+Color Renderer::ShadeVertex(const Vector3d& world_pos, const Vector3d& world_normal,
+                            const Color& base_color, const std::vector<Light>& lights) const {
+
+    Color diffuse;
+
+    for (const auto& light : lights) {
+        diffuse = diffuse + ApplyLight(world_pos, world_normal, light.GetColor(), light);
+    }
     Color ambient = base_color * ambient_;
 
     return (ambient + diffuse).Clamped();
@@ -95,7 +106,8 @@ Screen Renderer::Render(const World& world, const Camera& camera, Screen& screen
 
     Matrix4d view = ComputeViewMatrix(camera);
     Matrix4d proj = ComputeProjectionMatrix(camera);
-    const Light& light = world.GetLight();
+
+    const std::vector<Light>& lights = world.GetLights();
 
     int w = screen.GetWidth();
     int h = screen.GetHeight();
@@ -110,7 +122,7 @@ Screen Renderer::Render(const World& world, const Camera& camera, Screen& screen
 
         for (const Triangle& triangle : object.GetTriangles()) {
             auto local_verts = triangle.GetVertices();
-            auto vertexNormals = triangle.GetVertexNormals();
+            auto vertex_normals = triangle.GetVertexNormals();
 
             std::array<ClipVertex, 3> clip_verts;
             bool behind_camera = false;
@@ -122,8 +134,8 @@ Screen Renderer::Render(const World& world, const Camera& camera, Screen& screen
 
                 if (!is_wire) {
                     Vector3d world_pos(world_h.x(), world_h.y(), world_h.z());
-                    Vector3d world_normal = normal_matrix * vertexNormals[i];
-                    clip_verts[i].color = ShadeVertex(world_pos, world_normal, base_color, light);
+                    Vector3d world_normal = normal_matrix * vertex_normals[i];
+                    clip_verts[i].color = ShadeVertex(world_pos, world_normal, base_color, lights);
                 } else {
                     clip_verts[i].color = frame_color_;
                 }

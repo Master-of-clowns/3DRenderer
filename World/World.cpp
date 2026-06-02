@@ -16,12 +16,12 @@ const std::vector<Object>& World::GetObjects() const {
     return objects_;
 }
 
-const Light& World::GetLight() const {
-    return light_;
+const std::vector<Light>& World::GetLights() const {
+    return lights_;
 }
 
-void World::SetLight(const Light& light) {
-    light_ = light;
+void World::AddLight(const Light& light) {
+    lights_.push_back(light);
 }
 
 std::vector<Object>::const_iterator World::begin() const {

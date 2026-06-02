@@ -16,13 +16,13 @@ public:
 
     const std::vector<Object>& GetObjects() const;
 
-    const Light& GetLight() const;
-    void SetLight(const Light& light);
+    const std::vector<Light>& GetLights() const;
+    void AddLight(const Light& light);
 
     std::vector<Object>::const_iterator begin() const;
     std::vector<Object>::const_iterator end() const;
 
 private:
     std::vector<Object> objects_;
-    Light light_;
+    std::vector<Light> lights_;
 };

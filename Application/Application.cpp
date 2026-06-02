@@ -6,43 +6,55 @@
 #include <iostream>
 
 namespace {
-constexpr unsigned int kWidth  = 600;
+constexpr unsigned int kWidth = 600;
 constexpr unsigned int kHeight = 600;
 }
 
 Application::Application()
     : window_(sf::VideoMode({kWidth, kHeight}), "3D Renderer")
-    , screen_(ScreenWidth{static_cast<int>(kWidth)}, ScreenHeight{static_cast<int>(kHeight)})
-    , display_(&window_, ScreenWidth{static_cast<int>(kWidth)}, ScreenHeight{static_cast<int>(kHeight)})
-    , camera_(
-        Vector3d(-100.0, 0, 0.0),
-        Vector3d(-1.0, 0, 0.0),
-        Vector3d(0.0, 0.0, 1.0),
-        60.0,
-        static_cast<double>(kWidth) / kHeight,
-        0.1,
-        2000.0
-      )
-    , camera_controller_(&camera_, Vector3d(0.0, 0.0, 0.0), 200.0, 0.0, 0.3)
-{
+      , screen_(ScreenWidth{static_cast<int>(kWidth)}, ScreenHeight{static_cast<int>(kHeight)})
+      , display_(&window_, ScreenWidth{static_cast<int>(kWidth)}, ScreenHeight{static_cast<int>(kHeight)})
+      , camera_(
+          Vector3d(-100.0, 0, 0.0),
+          Vector3d(-1.0, 0, 0.0),
+          Vector3d(0.0, 0.0, 1.0),
+          60.0,
+          static_cast<double>(kWidth) / kHeight,
+          0.1,
+          2000.0
+          )
+      , camera_controller_(&camera_, Vector3d(0.0, 0.0, 0.0), 200.0, 0.0, 0.3) {
     window_.setFramerateLimit(60);
 
     ParserOBJ parser;
-    std::string filename = "../humster.obj";
+    std::string filename = "../teapot.obj";
     std::cout << "Loading OBJ file: " << filename << std::endl;
 
     Object skull(parser.Parse(filename), Vector3d(0.0, 0.0, .0));
+
+    // Object skull2(parser.Parse(filename), Vector3d(5.0, 0.0, .0));
     std::cout << "len " << skull.GetTriangles().size() << std::endl;
     skull.SetColor(Color(0.85, 0.80, 0.70));
     world_.AddObject(std::move(skull));
 
+    // skull2.SetColor(Color(0.85, 0.80, 0.70));
+    // world_.AddObject(std::move(skull2));
+
     Light light(
         Vector3d(150.0, 150.0, 200.0),
-        Color(1.0, 1.0, 1.0),
+        Color(1.0, 0.0, 0.0),
         1.0,
         400.0
-    );
-    world_.SetLight(light);
+        );
+
+    Light light2(
+        Vector3d(-150.0, 150.0, 200.0),
+        Color(0.0, 1.0, 0.0),
+        1.0,
+        400.0
+        );
+    world_.AddLight(light);
+    world_.AddLight(light2);
 }
 
 void Application::Run() {
