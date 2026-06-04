@@ -1,23 +1,28 @@
-#ifndef WORLD_H
-#define WORLD_H
+#pragma once
 
-#include "../Figures/Triangle.h"
+#include "../Figures/Object.h"
+#include "../Renderer/Light.h"
 #include <vector>
-using namespace std;
 
-class World {
+class World
+{
 public:
-    vector<Triangle> triangles;
+    World() = default;
 
-    World();
+    void AddObject(Object&& object);
+    void AddObject(const Object& object);
 
-    World(int n);
+    bool IsEmpty() const;
 
-    void AddTriangle(Triangle triangle);
+    const std::vector<Object>& GetObjects() const;
 
-    void SetTriangles(vector<Triangle> triangles);
+    const std::vector<Light>& GetLights() const;
+    void AddLight(const Light& light);
+
+    std::vector<Object>::const_iterator begin() const;
+    std::vector<Object>::const_iterator end() const;
+
+private:
+    std::vector<Object> objects_;
+    std::vector<Light> lights_;
 };
-
-
-
-#endif

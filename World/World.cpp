@@ -1,20 +1,33 @@
-//
-// Created by s24b_ on 29.01.2026.
-//
-
 #include "World.h"
 
-World::World(){};
-
-World::World(int n){
-	triangles.resize(n);
+void World::AddObject(Object&& object) {
+    objects_.push_back(std::move(object));
 }
 
-void World::AddTriangle(Triangle triangle){
-	triangles.push_back(triangle);
+void World::AddObject(const Object& object) {
+    objects_.push_back(object);
 }
 
+bool World::IsEmpty() const {
+    return objects_.empty();
+}
 
-void World::SetTriangles(vector<Triangle> triangles){
-	this->triangles = triangles;
+const std::vector<Object>& World::GetObjects() const {
+    return objects_;
+}
+
+const std::vector<Light>& World::GetLights() const {
+    return lights_;
+}
+
+void World::AddLight(const Light& light) {
+    lights_.push_back(light);
+}
+
+std::vector<Object>::const_iterator World::begin() const {
+    return objects_.begin();
+}
+
+std::vector<Object>::const_iterator World::end() const {
+    return objects_.end();
 }
